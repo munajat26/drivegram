@@ -30,7 +30,7 @@ export default function PhotoCard({ photo, onClick, onDelete, priority = false }
   return (
     <div
       className="photo-card group relative rounded-xl overflow-hidden cursor-pointer"
-      style={{ background: '#1A1A24' }}
+      style={{ background: 'var(--panel)' }}
       onClick={() => onClick?.(photo)}>
 
       {/* Skeleton */}
@@ -62,13 +62,13 @@ export default function PhotoCard({ photo, onClick, onDelete, priority = false }
         />
       ) : (
         <div className="flex flex-col items-center justify-center gap-2"
-             style={{ aspectRatio: '1', background: '#252535' }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8B8578" strokeWidth="1.5">
+             style={{ aspectRatio: '1', background: 'var(--panel-2)' }}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--muted-text)" strokeWidth="1.5">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
           </svg>
-          <span className="text-xs" style={{ color: '#8B8578' }}>Gagal memuat</span>
+          <span className="text-xs" style={{ color: 'var(--muted-text)' }}>Gagal memuat</span>
         </div>
       )}
 
@@ -102,7 +102,7 @@ export default function PhotoCard({ photo, onClick, onDelete, priority = false }
         <div className="absolute top-2 left-2 flex flex-wrap gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {photo.tags.slice(0, 2).map((tag, i) => (
             <span key={i} className="px-2 py-0.5 rounded-full text-xs"
-                  style={{ background: 'rgba(200,169,110,0.85)', color: '#0A0A0F' }}>
+                  style={{ background: 'color-mix(in srgb, var(--accent) 85%, transparent)', color: 'var(--accent-contrast)' }}>
               #{tag}
             </span>
           ))}

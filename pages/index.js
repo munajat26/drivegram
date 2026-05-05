@@ -215,24 +215,20 @@ export default function Home() {
     return (
       <>
         <Head><title>Drivegram - Setup</title></Head>
-        <div className="min-h-screen flex items-center justify-center p-6" style={{ background: '#0A0A0F' }}>
+        <div className="app-shell flex items-center justify-center p-6">
           <div className="max-w-lg w-full text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                 style={{ background: 'linear-gradient(135deg, #C8A96E, #8B5E2E)' }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <circle cx="8.5" cy="8.5" r="1.5"/>
-                <polyline points="21 15 16 10 5 21"/>
-              </svg>
-            </div>
-            <h1 className="font-display text-3xl mb-3" style={{ color: '#C8A96E' }}>Drivegram</h1>
-            <p className="mb-8" style={{ color: '#8B8578' }}>
+            <img
+              src="/logo.png"
+              alt="Drivegram"
+              className="w-16 h-16 rounded-2xl object-cover mx-auto mb-6"
+            />
+            <h1 className="font-display text-3xl mb-3" style={{ color: 'var(--accent)' }}>Drivegram</h1>
+            <p className="mb-8" style={{ color: 'var(--muted-text)' }}>
               Instagram pribadi dengan Google Drive sebagai penyimpanan
             </p>
 
-            <div className="rounded-2xl p-6 text-left space-y-4 border border-white/8"
-                 style={{ background: '#1A1A24' }}>
-              <h2 className="font-medium text-sm uppercase tracking-wider" style={{ color: '#C8A96E' }}>
+            <div className="rounded-2xl p-6 text-left space-y-4 panel">
+              <h2 className="font-medium text-sm uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
                 Cara Setup
               </h2>
               
@@ -245,19 +241,19 @@ export default function Home() {
               ].map(step => (
                 <div key={step.n} className="flex gap-3">
                   <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-xs font-bold mt-0.5"
-                       style={{ background: 'rgba(200,169,110,0.15)', color: '#C8A96E' }}>
+                       style={{ background: 'rgba(200,169,110,0.15)', color: 'var(--accent)' }}>
                     {step.n}
                   </div>
                   <div>
-                    <p className="text-sm font-medium" style={{ color: '#F5F0E8' }}>{step.title}</p>
-                    <p className="text-xs mt-0.5" style={{ color: '#8B8578' }}>{step.desc}</p>
+                    <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>{step.title}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--muted-text)' }}>{step.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-4 p-4 rounded-xl text-left font-mono text-xs border border-white/8"
-                 style={{ background: '#0F0F18', color: '#C8A96E' }}>
+            <div className="mt-4 p-4 rounded-xl text-left font-mono text-xs panel-soft"
+                 style={{ color: 'var(--accent)' }}>
               # .env.local<br/>
               NEXT_PUBLIC_GAS_URL=https://script.google.com/macros/s/YOUR_ID/exec
             </div>
@@ -271,7 +267,7 @@ export default function Home() {
     return (
       <>
         <Head><title>Drivegram</title></Head>
-        <div className="min-h-screen flex items-center justify-center" style={{ background: '#0A0A0F', color: '#8B8578' }}>
+        <div className="app-shell flex items-center justify-center" style={{ color: 'var(--muted-text)' }}>
           Memeriksa sesi...
         </div>
       </>
@@ -286,7 +282,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="min-h-screen" style={{ background: '#0A0A0F' }}>
+      <div className="app-shell">
         <Navbar
           user={currentUser}
           onLogout={handleLogout}
@@ -296,20 +292,19 @@ export default function Home() {
 
         {/* Hero stats */}
         <div className="pt-24 pb-8 px-4 max-w-6xl mx-auto">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between mb-6">
             <div>
-              <h1 className="font-display text-4xl mb-1 animate-fade-up" style={{ color: '#F5F0E8' }}>
+              <h1 className="font-display text-4xl mb-1 animate-fade-up" style={{ color: 'var(--text)' }}>
                 Galeri Saya
               </h1>
-              <p className="animate-fade-up delay-100" style={{ color: '#8B8578' }}>
+              <p className="animate-fade-up delay-100" style={{ color: 'var(--muted-text)' }}>
                 {total > 0 ? `${total} foto tersimpan di Google Drive` : 'Belum ada foto'}
                 {stats && ` · ${stats.totalSizeMB} MB digunakan`}
               </p>
             </div>
             {(searchQuery || activeTag) && (
               <button onClick={() => { setSearchQuery(''); setActiveTag(''); }}
-                      className="px-4 py-2 rounded-full text-sm border border-white/10 hover:bg-white/5 transition-colors"
-                      style={{ color: '#8B8578' }}>
+                      className="px-4 py-2 rounded-full text-sm surface-button transition-colors self-start sm:self-auto">
                 ✕ Reset filter
               </button>
             )}
@@ -321,9 +316,9 @@ export default function Home() {
               <button onClick={() => setActiveTag('')}
                       className="px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-all shrink-0"
                       style={{
-                        background: !activeTag ? 'linear-gradient(135deg, #C8A96E, #9A7240)' : 'rgba(255,255,255,0.06)',
-                        color: !activeTag ? '#0A0A0F' : '#8B8578',
-                        border: !activeTag ? 'none' : '1px solid rgba(255,255,255,0.08)'
+                        background: !activeTag ? 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #6b4518))' : 'var(--input-bg)',
+                        color: !activeTag ? 'var(--accent-contrast)' : 'var(--muted-text)',
+                        border: !activeTag ? 'none' : '1px solid var(--border)'
                       }}>
                 Semua
               </button>
@@ -331,9 +326,9 @@ export default function Home() {
                 <button key={tag} onClick={() => handleTagClick(tag)}
                         className="px-3 py-1.5 rounded-full text-xs whitespace-nowrap transition-all shrink-0"
                         style={{
-                          background: activeTag === tag ? 'linear-gradient(135deg, #C8A96E, #9A7240)' : 'rgba(255,255,255,0.06)',
-                          color: activeTag === tag ? '#0A0A0F' : '#8B8578',
-                          border: activeTag === tag ? 'none' : '1px solid rgba(255,255,255,0.08)'
+                          background: activeTag === tag ? 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #6b4518))' : 'var(--input-bg)',
+                          color: activeTag === tag ? 'var(--accent-contrast)' : 'var(--muted-text)',
+                          border: activeTag === tag ? 'none' : '1px solid var(--border)'
                         }}>
                   #{tag} <span className="opacity-60 ml-1">{count}</span>
                 </button>
@@ -353,17 +348,16 @@ export default function Home() {
           ) : error ? (
             <div className="text-center py-20">
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                   style={{ background: 'rgba(220,38,38,0.1)' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FCA5A5" strokeWidth="1.5">
+                   style={{ background: 'var(--danger-bg)' }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--danger-text)" strokeWidth="1.5">
                   <circle cx="12" cy="12" r="10"/>
                   <line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
               </div>
-              <p className="font-medium mb-2" style={{ color: '#FCA5A5' }}>Koneksi Gagal</p>
-              <p className="text-sm mb-4" style={{ color: '#8B8578' }}>{error}</p>
+              <p className="font-medium mb-2" style={{ color: 'var(--danger-text)' }}>Koneksi Gagal</p>
+              <p className="text-sm mb-4" style={{ color: 'var(--muted-text)' }}>{error}</p>
               <button onClick={() => loadPhotos(true)}
-                      className="px-4 py-2 rounded-lg text-sm border border-white/10 hover:bg-white/5 transition-colors"
-                      style={{ color: '#F5F0E8' }}>
+                      className="px-4 py-2 rounded-lg text-sm surface-button transition-colors">
                 Coba lagi
               </button>
             </div>
@@ -371,16 +365,16 @@ export default function Home() {
             <div className="text-center py-24">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
                    style={{ background: 'rgba(200,169,110,0.08)', border: '1px dashed rgba(200,169,110,0.2)' }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" strokeWidth="1.5">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
                   <rect x="3" y="3" width="18" height="18" rx="2"/>
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
               </div>
-              <p className="font-display text-xl mb-2" style={{ color: '#F5F0E8' }}>
+              <p className="font-display text-xl mb-2" style={{ color: 'var(--text)' }}>
                 {searchQuery || activeTag ? 'Tidak ada hasil' : 'Belum ada foto'}
               </p>
-              <p className="text-sm mb-6" style={{ color: '#8B8578' }}>
+              <p className="text-sm mb-6" style={{ color: 'var(--muted-text)' }}>
                 {searchQuery || activeTag 
                   ? 'Coba kata kunci atau filter lain'
                   : 'Upload foto pertamamu ke Google Drive'}
@@ -388,7 +382,7 @@ export default function Home() {
               {!searchQuery && !activeTag && (
                 <button onClick={() => setShowUpload(true)}
                         className="px-6 py-3 rounded-full text-sm font-medium transition-all hover:scale-105"
-                        style={{ background: 'linear-gradient(135deg, #C8A96E, #9A7240)', color: '#0A0A0F' }}>
+                        style={{ background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #6b4518))', color: 'var(--accent-contrast)' }}>
                   Upload Foto Pertama
                 </button>
               )}
@@ -413,8 +407,7 @@ export default function Home() {
               {hasMore && (
                 <div className="text-center mt-10">
                   <button onClick={() => loadPhotos(false)} disabled={loadingMore}
-                          className="px-8 py-3 rounded-full text-sm border border-white/10 hover:bg-white/5 transition-all hover:scale-105 disabled:opacity-50"
-                          style={{ color: '#8B8578' }}>
+                          className="px-8 py-3 rounded-full text-sm surface-button transition-all hover:scale-105 disabled:opacity-50">
                     {loadingMore ? 'Memuat...' : 'Muat lebih banyak'}
                   </button>
                 </div>
@@ -426,7 +419,7 @@ export default function Home() {
         {/* FAB Upload - Mobile */}
         <button onClick={() => setShowUpload(true)}
                 className="fixed bottom-6 right-6 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all hover:scale-110 active:scale-95 md:hidden"
-                style={{ background: 'linear-gradient(135deg, #C8A96E, #8B5E2E)' }}>
+                style={{ background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 70%, #5f421e))' }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
           </svg>

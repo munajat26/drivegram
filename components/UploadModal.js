@@ -81,13 +81,13 @@ export default function UploadModal({ onClose, onSuccess }) {
          onClick={(e) => e.target === e.currentTarget && !uploading && onClose()}>
       
       <div className="w-full sm:max-w-lg rounded-t-3xl sm:rounded-2xl overflow-hidden animate-fade-up"
-           style={{ background: '#1A1A24', border: '1px solid rgba(255,255,255,0.06)' }}>
+           style={{ background: 'var(--panel)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-soft)' }}>
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
-          <h2 className="font-display text-lg" style={{ color: '#F5F0E8' }}>Upload Foto</h2>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: '1px solid var(--border)' }}>
+          <h2 className="font-display text-lg" style={{ color: 'var(--text)' }}>Upload Foto</h2>
           {!uploading && (
-            <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10 transition-colors text-muted hover:text-paper">
+            <button onClick={onClose} className="p-2 rounded-full surface-button transition-colors">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
@@ -101,22 +101,22 @@ export default function UploadModal({ onClose, onSuccess }) {
             <div {...getRootProps()} 
                  className="border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all"
                  style={{ 
-                   borderColor: isDragActive ? '#C8A96E' : 'rgba(255,255,255,0.12)',
+                   borderColor: isDragActive ? 'var(--accent)' : 'var(--border-strong)',
                    background: isDragActive ? 'rgba(200,169,110,0.05)' : 'transparent'
                  }}>
               <input {...getInputProps()} />
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
                    style={{ background: 'rgba(200,169,110,0.1)' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" strokeWidth="1.5">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="1.5">
                   <rect x="3" y="3" width="18" height="18" rx="2"/>
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
               </div>
-              <p className="font-medium mb-1" style={{ color: '#F5F0E8' }}>
+              <p className="font-medium mb-1" style={{ color: 'var(--text)' }}>
                 {isDragActive ? 'Lepaskan foto di sini' : 'Drag & drop atau klik untuk pilih'}
               </p>
-              <p className="text-sm" style={{ color: '#8B8578' }}>
+              <p className="text-sm" style={{ color: 'var(--muted-text)' }}>
                 JPG, PNG, GIF, WebP — Maks. 20MB per file
               </p>
             </div>
@@ -136,9 +136,9 @@ export default function UploadModal({ onClose, onSuccess }) {
               ))}
               {/* Add more button */}
               <div {...getRootProps()} className="aspect-square rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition-colors"
-                   style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+                   style={{ borderColor: 'var(--border-strong)' }}>
                 <input {...getInputProps()} />
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B8578" strokeWidth="2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--muted-text)" strokeWidth="2">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
               </div>
@@ -147,7 +147,7 @@ export default function UploadModal({ onClose, onSuccess }) {
 
           {/* Caption */}
           <div>
-            <label className="block text-xs font-medium mb-2" style={{ color: '#8B8578' }}>
+            <label className="block text-xs font-medium mb-2" style={{ color: 'var(--muted-text)' }}>
               CAPTION
             </label>
             <textarea
@@ -155,29 +155,27 @@ export default function UploadModal({ onClose, onSuccess }) {
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Tulis caption yang menarik..."
               rows={3}
-              className="w-full rounded-xl px-4 py-3 text-sm resize-none border border-white/8 transition-colors"
-              style={{ background: 'rgba(255,255,255,0.04)', color: '#F5F0E8' }}
+              className="w-full rounded-xl px-4 py-3 text-sm resize-none field transition-colors"
             />
           </div>
 
           {/* Tags */}
           <div>
-            <label className="block text-xs font-medium mb-2" style={{ color: '#8B8578' }}>
-              TAGS <span style={{ color: '#8B8578', fontWeight: 400 }}>(pisahkan dengan koma)</span>
+            <label className="block text-xs font-medium mb-2" style={{ color: 'var(--muted-text)' }}>
+              TAGS <span style={{ color: 'var(--muted-text)', fontWeight: 400 }}>(pisahkan dengan koma)</span>
             </label>
             <input
               type="text"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="liburan, keluarga, kuliner"
-              className="w-full rounded-xl px-4 py-3 text-sm border border-white/8"
-              style={{ background: 'rgba(255,255,255,0.04)', color: '#F5F0E8' }}
+              className="w-full rounded-xl px-4 py-3 text-sm field"
             />
           </div>
 
           {/* Error */}
           {error && (
-            <div className="px-4 py-3 rounded-xl text-sm" style={{ background: 'rgba(220,38,38,0.1)', color: '#FCA5A5' }}>
+            <div className="px-4 py-3 rounded-xl text-sm" style={{ background: 'var(--danger-bg)', color: 'var(--danger-text)' }}>
               {error}
             </div>
           )}
@@ -185,13 +183,13 @@ export default function UploadModal({ onClose, onSuccess }) {
           {/* Upload Progress */}
           {uploading && (
             <div>
-              <div className="flex justify-between text-xs mb-2" style={{ color: '#8B8578' }}>
+              <div className="flex justify-between text-xs mb-2" style={{ color: 'var(--muted-text)' }}>
                 <span>Mengupload...</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.08)' }}>
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
                 <div className="h-full rounded-full transition-all duration-300"
-                     style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #C8A96E, #9A7240)' }} />
+                     style={{ width: `${progress}%`, background: 'linear-gradient(90deg, var(--accent), #9A7240)' }} />
               </div>
             </div>
           )}
@@ -201,7 +199,7 @@ export default function UploadModal({ onClose, onSuccess }) {
             onClick={handleUpload}
             disabled={uploading || files.length === 0}
             className="w-full py-3 rounded-xl font-medium text-sm transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
-            style={{ background: 'linear-gradient(135deg, #C8A96E, #9A7240)', color: '#0A0A0F' }}>
+            style={{ background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #6b4518))', color: 'var(--accent-contrast)' }}>
             {uploading ? `Mengupload ke Google Drive... (${progress}%)` : `Upload ${files.length > 0 ? files.length + ' ' : ''}Foto`}
           </button>
         </div>

@@ -60,7 +60,7 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
          onClick={(e) => e.target === e.currentTarget && onClose()}>
       
       <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col md:flex-row rounded-2xl overflow-hidden animate-fade-in"
-           style={{ background: '#1A1A24', border: '1px solid rgba(255,255,255,0.06)' }}>
+           style={{ background: 'var(--panel)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-soft)' }}>
 
         {/* Close Button */}
         <button onClick={onClose}
@@ -73,7 +73,7 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
 
         {/* Image */}
         <div className="flex-1 flex items-center justify-center min-h-[300px] md:min-h-0 relative"
-             style={{ background: '#0A0A0F' }}>
+             style={{ background: 'var(--bg)' }}>
           {!imgLoaded && (
             <div className="absolute inset-0 skeleton" />
           )}
@@ -93,7 +93,7 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
             }}
           />
           {imgError && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" style={{ color: '#8B8578' }}>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2" style={{ color: 'var(--muted-text)' }}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <rect x="3" y="3" width="18" height="18" rx="2"/>
                 <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -105,18 +105,18 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
         </div>
 
         {/* Info Panel */}
-        <div className="w-full md:w-72 flex flex-col border-t md:border-t-0 md:border-l border-white/5 overflow-y-auto">
+        <div className="w-full md:w-72 flex flex-col overflow-y-auto" style={{ borderColor: 'var(--border)' }}>
           
           {/* Meta */}
-          <div className="p-5 border-b border-white/5">
-            <p className="text-xs mb-1 font-mono" style={{ color: '#8B8578' }}>
+          <div className="p-5" style={{ borderBottom: '1px solid var(--border)' }}>
+            <p className="text-xs mb-1 font-mono" style={{ color: 'var(--muted-text)' }}>
               {formatRelativeTime(photo.uploadedAt)}
             </p>
-            <p className="text-xs" style={{ color: '#8B8578' }}>
+            <p className="text-xs" style={{ color: 'var(--muted-text)' }}>
               {photo.filename}
             </p>
             {photo.size && (
-              <p className="text-xs mt-0.5" style={{ color: '#8B8578' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--muted-text)' }}>
                 {formatFileSize(photo.size)}
               </p>
             )}
@@ -127,35 +127,32 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
             {editing ? (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#8B8578' }}>CAPTION</label>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--muted-text)' }}>CAPTION</label>
                   <textarea
                     value={caption}
                     onChange={(e) => setCaption(e.target.value)}
                     rows={4}
-                    className="w-full rounded-lg px-3 py-2 text-sm resize-none border border-white/8"
-                    style={{ background: 'rgba(255,255,255,0.04)', color: '#F5F0E8' }}
+                    className="w-full rounded-lg px-3 py-2 text-sm resize-none field"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium mb-1.5" style={{ color: '#8B8578' }}>TAGS</label>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--muted-text)' }}>TAGS</label>
                   <input
                     type="text"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     placeholder="tag1, tag2"
-                    className="w-full rounded-lg px-3 py-2 text-sm border border-white/8"
-                    style={{ background: 'rgba(255,255,255,0.04)', color: '#F5F0E8' }}
+                    className="w-full rounded-lg px-3 py-2 text-sm field"
                   />
                 </div>
                 <div className="flex gap-2">
                   <button onClick={handleSave} disabled={saving}
                           className="flex-1 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
-                          style={{ background: 'linear-gradient(135deg, #C8A96E, #9A7240)', color: '#0A0A0F' }}>
+                          style={{ background: 'linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #6b4518))', color: 'var(--accent-contrast)' }}>
                     {saving ? 'Menyimpan...' : 'Simpan'}
                   </button>
                   <button onClick={() => setEditing(false)}
-                          className="flex-1 py-2 rounded-lg text-sm border border-white/10 hover:bg-white/5 transition-colors"
-                          style={{ color: '#F5F0E8' }}>
+                          className="flex-1 py-2 rounded-lg text-sm surface-button transition-colors">
                     Batal
                   </button>
                 </div>
@@ -163,16 +160,16 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
             ) : (
               <div>
                 {caption ? (
-                  <p className="text-sm mb-4 leading-relaxed" style={{ color: '#F5F0E8' }}>{caption}</p>
+                  <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text)' }}>{caption}</p>
                 ) : (
-                  <p className="text-sm mb-4 italic" style={{ color: '#8B8578' }}>Belum ada caption</p>
+                  <p className="text-sm mb-4 italic" style={{ color: 'var(--muted-text)' }}>Belum ada caption</p>
                 )}
                 
                 {photo.tags?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {photo.tags.map((tag, i) => (
                       <span key={i} className="px-2.5 py-1 rounded-full text-xs"
-                            style={{ background: 'rgba(200,169,110,0.12)', color: '#C8A96E', border: '1px solid rgba(200,169,110,0.2)' }}>
+                            style={{ background: 'rgba(200,169,110,0.12)', color: 'var(--accent)', border: '1px solid rgba(200,169,110,0.2)' }}>
                         #{tag}
                       </span>
                     ))}
@@ -186,8 +183,7 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
           {!editing && (
             <div className="p-5 pt-0 flex gap-2">
               <button onClick={() => setEditing(true)}
-                      className="flex-1 py-2 rounded-lg text-sm border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
-                      style={{ color: '#F5F0E8' }}>
+                      className="flex-1 py-2 rounded-lg text-sm surface-button transition-colors flex items-center justify-center gap-2">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -195,8 +191,7 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
                 Edit
               </button>
               <a href={photo.driveUrl || photo.directUrl} target="_blank" rel="noopener noreferrer"
-                 className="flex-1 py-2 rounded-lg text-sm border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-2"
-                 style={{ color: '#F5F0E8' }}>
+                 className="flex-1 py-2 rounded-lg text-sm surface-button transition-colors flex items-center justify-center gap-2">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                   <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
@@ -205,7 +200,7 @@ export default function PhotoModal({ photo, onClose, onDelete, onUpdate }) {
               </a>
               <button onClick={handleDelete}
                       className="py-2 px-3 rounded-lg text-sm border border-red-500/20 hover:bg-red-500/10 transition-colors"
-                      style={{ color: '#FCA5A5' }}>
+                      style={{ color: 'var(--danger-text)' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <polyline points="3 6 5 6 21 6"/>
                   <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
