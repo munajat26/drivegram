@@ -4,7 +4,7 @@
 
 function clampSize(value) {
   const size = Number.parseInt(value, 10);
-  if (!Number.isFinite(size)) return 600;
+  if (!Number.isFinite(size)) return 360;
   return Math.max(100, Math.min(size, 2400));
 }
 
@@ -54,7 +54,8 @@ export default async function handler(req, res) {
       const image = await fetchImage(url);
       if (image) {
         res.setHeader('Content-Type', image.contentType);
-        res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+        res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
+        res.setHeader('Content-Length', image.body.length);
         return res.status(200).send(image.body);
       }
     }

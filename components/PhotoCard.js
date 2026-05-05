@@ -1,17 +1,15 @@
 // components/PhotoCard.js
 import { useEffect, useState } from 'react';
-import { formatRelativeTime, getAuthToken } from '../lib/api';
+import { formatRelativeTime } from '../lib/api';
 
-function cardImageUrl(photo) {
+function cardImageUrl(photo, size = 360) {
   if (photo.fileId) {
-    const token = getAuthToken();
-    const tokenParam = token ? `&token=${encodeURIComponent(token)}` : '';
-    return `/api/image?id=${encodeURIComponent(photo.fileId)}&size=600${tokenParam}`;
+    return `/api/image?id=${encodeURIComponent(photo.fileId)}&size=${size}`;
   }
   return photo.thumbnailUrl || photo.directUrl;
 }
 
-export default function PhotoCard({ photo, onClick, onDelete }) {
+export default function PhotoCard({ photo, onClick, onDelete, priority = false }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [imgSrc, setImgSrc] = useState(cardImageUrl(photo));
@@ -44,8 +42,12 @@ export default function PhotoCard({ photo, onClick, onDelete }) {
       {!imgError ? (
         <img
           src={imgSrc}
+          srcSet={photo.fileId ? `${cardImageUrl(photo, 240)} 240w, ${cardImageUrl(photo, 360)} 360w, ${cardImageUrl(photo, 480)} 480w` : undefined}
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
           alt={photo.caption || photo.filename}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'low'}
           className="relative z-10 w-full object-cover transition-opacity duration-300"
           style={{ opacity: 1, aspectRatio: '1' }}
           onLoad={() => setImgLoaded(true)}

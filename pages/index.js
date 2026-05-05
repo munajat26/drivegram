@@ -9,6 +9,36 @@ import UploadModal from '../components/UploadModal';
 import { clearAuthSession, deletePhoto, getAuthSession, getMe, getPhotos, getStats, logoutUser } from '../lib/api';
 
 const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL;
+const PHOTOS_PAGE_SIZE = 16;
+const PHOTO_CACHE_PREFIX = 'drivegram_photos_cache:';
+
+function getPhotoCacheKey(searchQuery, activeTag) {
+  return `${PHOTO_CACHE_PREFIX}${searchQuery || ''}:${activeTag || ''}`;
+}
+
+function readPhotoCache(searchQuery, activeTag) {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(getPhotoCacheKey(searchQuery, activeTag));
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+function writePhotoCache(searchQuery, activeTag, data) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(getPhotoCacheKey(searchQuery, activeTag), JSON.stringify({
+      photos: data.photos || [],
+      total: data.total || 0,
+      hasMore: !!data.hasMore,
+      savedAt: Date.now(),
+    }));
+  } catch (err) {
+    // Cache lokal hanya untuk mempercepat render; aman diabaikan jika penuh.
+  }
+}
 
 export default function Home() {
   const router = useRouter();
@@ -36,15 +66,30 @@ export default function Home() {
       setLoading(false);
       return;
     }
+
+    let showedCache = false;
     
     try {
-      if (reset) setLoading(true);
-      else setLoadingMore(true);
+      if (reset) {
+        const cached = readPhotoCache(searchQuery, activeTag);
+        if (cached?.photos?.length) {
+          setPhotos(cached.photos);
+          setTotal(cached.total);
+          setHasMore(cached.hasMore);
+          setPage(2);
+          setLoading(false);
+          showedCache = true;
+        } else {
+          setLoading(true);
+        }
+      } else {
+        setLoadingMore(true);
+      }
 
       const currentPage = reset ? 1 : page;
       const result = await getPhotos({ 
         page: currentPage, 
-        limit: 21,
+        limit: PHOTOS_PAGE_SIZE,
         search: searchQuery,
         tag: activeTag
       });
@@ -53,6 +98,7 @@ export default function Home() {
         if (reset) {
           setPhotos(result.photos);
           setPage(2);
+          writePhotoCache(searchQuery, activeTag, result);
         } else {
           setPhotos(prev => [...prev, ...result.photos]);
           setPage(p => p + 1);
@@ -64,7 +110,9 @@ export default function Home() {
         setError(result.error || 'Gagal memuat foto');
       }
     } catch (err) {
-      setError(err.message || 'Tidak dapat terhubung ke server. Pastikan GAS URL sudah dikonfigurasi.');
+      if (!showedCache) {
+        setError(err.message || 'Tidak dapat terhubung ke server. Pastikan GAS URL sudah dikonfigurasi.');
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -89,6 +137,11 @@ export default function Home() {
       return;
     }
 
+    if (session.user) {
+      setCurrentUser(session.user);
+      setAuthChecking(false);
+    }
+
     getMe()
       .then((result) => {
         if (!result.success) throw new Error(result.error || 'Sesi tidak valid');
@@ -104,7 +157,8 @@ export default function Home() {
   useEffect(() => {
     if (!currentUser) return;
     loadPhotos(true);
-    loadStats();
+    const statsTimer = window.setTimeout(() => loadStats(), 800);
+    return () => window.clearTimeout(statsTimer);
   }, [currentUser, searchQuery, activeTag]);
 
   const handleLogout = async () => {
@@ -347,6 +401,7 @@ export default function Home() {
                        style={{ animationDelay: `${Math.min(i, 10) * 0.04}s`, opacity: 0 }}>
                     <PhotoCard
                       photo={photo}
+                      priority={i < 6}
                       onClick={setSelectedPhoto}
                       onDelete={handleDelete}
                     />
