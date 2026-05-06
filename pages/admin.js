@@ -14,7 +14,7 @@ import {
 
 const statusColor = {
   approved: { bg: 'var(--success-bg)', fg: 'var(--success-text)' },
-  pending: { bg: 'rgba(250,204,21,0.1)', fg: '#FDE68A' },
+  pending: { bg: 'var(--warning-bg)', fg: 'var(--warning-text)' },
   rejected: { bg: 'var(--danger-bg)', fg: 'var(--danger-text)' },
 };
 
@@ -91,7 +91,7 @@ export default function AdminPage() {
   if (loading) {
     return (
       <>
-        <Head><title>Admin - Drivegram</title></Head>
+        <Head><title>Admin - Samawa</title></Head>
         <div className="app-shell flex items-center justify-center" style={{ color: 'var(--muted-text)' }}>
           Memuat admin panel...
         </div>
@@ -102,7 +102,7 @@ export default function AdminPage() {
   return (
     <>
       <Head>
-        <title>Admin - Drivegram</title>
+        <title>Admin - Samawa</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -112,10 +112,10 @@ export default function AdminPage() {
             <Link href="/" className="flex items-center gap-3">
               <img
                 src="/logo.png"
-                alt="Drivegram"
+                alt="Samawa"
                 className="w-8 h-8 rounded-lg object-cover"
               />
-              <span className="font-display text-lg" style={{ color: 'var(--accent)' }}>Drivegram Admin</span>
+              <span className="font-display text-lg" style={{ color: 'var(--accent)' }}>Samawa Admin</span>
             </Link>
             <div className="flex items-center gap-3">
               <span className="text-sm hidden sm:inline" style={{ color: 'var(--muted-text)' }}>{user?.email}</span>
@@ -145,8 +145,64 @@ export default function AdminPage() {
             </div>
           )}
 
-          <div className="overflow-x-auto rounded-2xl panel">
-            <table className="w-full text-sm">
+          <div className="md:hidden space-y-3">
+            {users.map((item) => {
+              const color = statusColor[item.status] || statusColor.pending;
+              return (
+                <article key={item.id} className="rounded-2xl panel p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="font-medium truncate" style={{ color: 'var(--text)' }}>{item.name}</div>
+                      <div className="text-xs mt-1 truncate" style={{ color: 'var(--muted-text)' }}>{item.email}</div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full text-xs shrink-0" style={{ background: color.bg, color: color.fg }}>
+                      {item.status}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mt-4">
+                    <div>
+                      <p className="text-xs mb-1" style={{ color: 'var(--muted-text)' }}>Role</p>
+                      <select
+                        value={item.role}
+                        disabled={busyId === item.id}
+                        onChange={(e) => updateRole(item.id, e.target.value)}
+                        className="w-full rounded-lg px-3 py-2 text-sm field">
+                        <option value="user">user</option>
+                        <option value="admin">admin</option>
+                      </select>
+                    </div>
+                    <div>
+                      <p className="text-xs mb-1" style={{ color: 'var(--muted-text)' }}>Dibuat</p>
+                      <div className="rounded-lg px-3 py-2 text-sm panel-soft" style={{ color: 'var(--text)' }}>
+                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString('id-ID') : '-'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <button
+                      disabled={busyId === item.id || item.status === 'approved'}
+                      onClick={() => updateApproval(item.id, 'approved')}
+                      className="px-3 py-2.5 rounded-xl text-xs font-medium disabled:opacity-40"
+                      style={{ background: 'var(--success-bg)', color: 'var(--success-text)' }}>
+                      Approve
+                    </button>
+                    <button
+                      disabled={busyId === item.id || item.status === 'rejected'}
+                      onClick={() => updateApproval(item.id, 'rejected')}
+                      className="px-3 py-2.5 rounded-xl text-xs font-medium disabled:opacity-40"
+                      style={{ background: 'var(--danger-bg)', color: 'var(--danger-text)' }}>
+                      Reject
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="hidden md:block overflow-x-auto rounded-2xl panel">
+            <table className="w-full text-sm min-w-[760px]">
               <thead>
                 <tr className="text-left" style={{ color: 'var(--muted-text)', borderBottom: '1px solid var(--border)' }}>
                   <th className="p-4 font-medium">User</th>

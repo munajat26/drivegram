@@ -59,7 +59,7 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>{mode === 'login' ? 'Login' : 'Register'} - Drivegram</title>
+        <title>{mode === 'login' ? 'Login' : 'Register'} - Samawa</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
@@ -71,10 +71,10 @@ export default function LoginPage() {
           <Link href="/" className="flex items-center justify-center gap-3 mb-8">
             <img
               src="/logo.png"
-              alt="Drivegram"
+              alt="Samawa"
               className="w-10 h-10 rounded-xl object-cover"
             />
-            <span className="font-display text-2xl" style={{ color: 'var(--accent)' }}>Drivegram</span>
+            <span className="font-display text-2xl" style={{ color: 'var(--accent)' }}>Samawa</span>
           </Link>
 
           <section className="rounded-2xl overflow-hidden panel">

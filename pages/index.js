@@ -10,7 +10,7 @@ import { clearAuthSession, deletePhoto, getAuthSession, getMe, getPhotos, getSta
 
 const GAS_URL = process.env.NEXT_PUBLIC_GAS_URL;
 const PHOTOS_PAGE_SIZE = 16;
-const PHOTO_CACHE_PREFIX = 'drivegram_photos_cache:';
+const PHOTO_CACHE_PREFIX = 'Samawa_photos_cache:';
 
 function getPhotoCacheKey(searchQuery, activeTag) {
   return `${PHOTO_CACHE_PREFIX}${searchQuery || ''}:${activeTag || ''}`;
@@ -214,15 +214,15 @@ export default function Home() {
   if (!isConfigured) {
     return (
       <>
-        <Head><title>Drivegram - Setup</title></Head>
+        <Head><title>Samawa - Setup</title></Head>
         <div className="app-shell flex items-center justify-center p-6">
           <div className="max-w-lg w-full text-center">
             <img
               src="/logo.png"
-              alt="Drivegram"
+              alt="Samawa"
               className="w-16 h-16 rounded-2xl object-cover mx-auto mb-6"
             />
-            <h1 className="font-display text-3xl mb-3" style={{ color: 'var(--accent)' }}>Drivegram</h1>
+            <h1 className="font-display text-3xl mb-3" style={{ color: 'var(--accent)' }}>Samawa</h1>
             <p className="mb-8" style={{ color: 'var(--muted-text)' }}>
               Instagram pribadi dengan Google Drive sebagai penyimpanan
             </p>
@@ -266,7 +266,7 @@ export default function Home() {
   if (authChecking) {
     return (
       <>
-        <Head><title>Drivegram</title></Head>
+        <Head><title>Samawa</title></Head>
         <div className="app-shell flex items-center justify-center" style={{ color: 'var(--muted-text)' }}>
           Memeriksa sesi...
         </div>
@@ -277,7 +277,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Drivegram — Galeri Pribadi</title>
+        <title>Samawa — Galeri Pribadi</title>
         <meta name="description" content="Galeri foto pribadi berbasis Google Drive" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>

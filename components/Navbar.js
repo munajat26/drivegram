@@ -20,11 +20,11 @@ export default function Navbar({ onUploadClick, onSearch, user, onLogout }) {
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <img
             src="/logo.png"
-            alt="Drivegram"
+            alt="Samawa"
             className="w-8 h-8 rounded-lg object-cover"
           />
           <span className="font-display text-lg tracking-wide text-brand">
-            Drivegram
+            Samawa
           </span>
         </Link>
 

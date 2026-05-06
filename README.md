@@ -1,4 +1,4 @@
-# 📸 Drivegram
+# 📸 Samawa
 
 **Instagram pribadi dengan Google Drive sebagai penyimpanan**
 
@@ -35,7 +35,7 @@ Upload, simpan, dan tampilkan foto dari Google Drive pribadimu dengan tampilan m
 6. **Deploy sebagai Web App:**
    - Klik **Deploy** → **New Deployment**
    - Pilih type: **Web App**
-   - Description: `Drivegram v1`
+   - Description: `Samawa v1`
    - Execute as: **Me** _(pakai akun Google kamu)_
    - Who has access: **Anyone** _(diperlukan agar Next.js bisa akses)_
    - Klik **Deploy**
@@ -76,12 +76,12 @@ Setelah pertama kali digunakan, akan otomatis terbuat:
 
 ```
 Google Drive/
-└── Drivegram/              ← Folder utama
+└── Drivegram/            ← Folder storage default
     ├── 2024-01/            ← Subfolder per bulan
     │   ├── foto1.jpg
     │   └── foto2.png
     ├── 2024-02/
-    └── Drivegram DB.xlsx   ← Database metadata
+    └── Drivegram DB.xlsx ← Database metadata
 ```
 
 ---
@@ -92,7 +92,7 @@ Di file `gas/Code.gs`, kamu bisa mengubah:
 
 ```javascript
 var CONFIG = {
-  ROOT_FOLDER_NAME: "Drivegram",  // Nama folder di Drive
+  ROOT_FOLDER_NAME: "Drivegram",  // Nama folder storage default
   SHEET_NAME: "Drivegram DB",     // Nama spreadsheet
   AUTH_PASSWORD: ""               // Password (kosongkan = tanpa password)
 };

@@ -16,7 +16,7 @@ async function fetchImage(url) {
   const response = await fetch(url, {
     redirect: 'follow',
     headers: {
-      'User-Agent': 'Mozilla/5.0 Drivegram Image Proxy',
+      'User-Agent': 'Mozilla/5.0 Samawa Image Proxy',
       Accept: 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
     },
   });
