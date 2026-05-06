@@ -51,11 +51,14 @@ export default function UploadModal({ onClose, onSuccess }) {
     setUploading(true);
     setError('');
     const results = [];
+    const albumId = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `album_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
     for (let i = 0; i < files.length; i++) {
       try {
         setProgress(Math.round((i / files.length) * 100));
-        const result = await uploadPhoto(files[i], caption, tags);
+        const result = await uploadPhoto(files[i], caption, tags, albumId);
         if (result.success) {
           results.push(result.photo);
         } else {

@@ -53,9 +53,14 @@ export default async function handler(req, res) {
     for (const url of candidates) {
       const image = await fetchImage(url);
       if (image) {
+        const wantsDownload = req.query.download === '1';
+        const filename = String(req.query.filename || `samawa-photo-${fileId}.jpg`).replace(/[^\w.\-() ]+/g, '_');
         res.setHeader('Content-Type', image.contentType);
         res.setHeader('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
         res.setHeader('Content-Length', image.body.length);
+        if (wantsDownload) {
+          res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        }
         return res.status(200).send(image.body);
       }
     }

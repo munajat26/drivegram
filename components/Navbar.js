@@ -1,9 +1,10 @@
 // components/Navbar.js
 import { useState } from 'react';
 import Link from 'next/link';
+import ProfileMenu from './ProfileMenu';
 import ThemeToggle from './ThemeToggle';
 
-export default function Navbar({ onUploadClick, onSearch, user, onLogout }) {
+export default function Navbar({ onUploadClick, onSearch, user, onLogout, onUserUpdate }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
 
@@ -67,13 +68,6 @@ export default function Navbar({ onUploadClick, onSearch, user, onLogout }) {
 
           <ThemeToggle />
 
-          {/* Upload Button */}
-          {user?.role === 'admin' && (
-            <Link href="/admin"
-                  className="hidden sm:flex items-center px-3 py-2 rounded-full text-sm surface-button transition-colors">
-              Admin
-            </Link>
-          )}
           <button
             onClick={onUploadClick}
             className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all hover:scale-105 active:scale-95"
@@ -83,16 +77,7 @@ export default function Navbar({ onUploadClick, onSearch, user, onLogout }) {
             </svg>
             <span className="hidden sm:inline">Upload</span>
           </button>
-          <button
-            onClick={onLogout}
-            title={user?.email || 'Logout'}
-            className="w-9 h-9 rounded-full surface-button transition-colors flex items-center justify-center">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-          </button>
+          <ProfileMenu user={user} onLogout={onLogout} onUserUpdate={onUserUpdate} />
         </div>
       </div>
 

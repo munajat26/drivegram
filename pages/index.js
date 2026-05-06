@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
-import PhotoCard from '../components/PhotoCard';
+import PhotoPost from '../components/PhotoPost';
 import PhotoModal from '../components/PhotoModal';
 import UploadModal from '../components/UploadModal';
 import { clearAuthSession, deletePhoto, getAuthSession, getMe, getPhotos, getStats, logoutUser } from '../lib/api';
@@ -40,6 +40,34 @@ function writePhotoCache(searchQuery, activeTag, data) {
   }
 }
 
+function groupPhotosIntoPosts(photos) {
+  const map = new Map();
+
+  photos.forEach((photo) => {
+    const albumId = photo.albumId || photo.id;
+    if (!map.has(albumId)) {
+      map.set(albumId, {
+        id: albumId,
+        uploadedAt: photo.uploadedAt,
+        photos: [],
+      });
+    }
+
+    const post = map.get(albumId);
+    post.photos.push(photo);
+    if (new Date(photo.uploadedAt) > new Date(post.uploadedAt)) {
+      post.uploadedAt = photo.uploadedAt;
+    }
+  });
+
+  return Array.from(map.values())
+    .map(post => ({
+      ...post,
+      photos: post.photos.sort((a, b) => new Date(a.uploadedAt) - new Date(b.uploadedAt)),
+    }))
+    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+}
+
 export default function Home() {
   const router = useRouter();
   const [photos, setPhotos] = useState([]);
@@ -60,6 +88,7 @@ export default function Home() {
   const [stats, setStats] = useState(null);
 
   const isConfigured = !!GAS_URL;
+  const photoPosts = groupPhotosIntoPosts(photos);
 
   const loadPhotos = useCallback(async (reset = false) => {
     if (!isConfigured || !currentUser) {
@@ -286,6 +315,7 @@ export default function Home() {
         <Navbar
           user={currentUser}
           onLogout={handleLogout}
+          onUserUpdate={setCurrentUser}
           onUploadClick={() => setShowUpload(true)}
           onSearch={handleSearch}
         />
@@ -337,12 +367,16 @@ export default function Home() {
           )}
         </div>
 
-        {/* Photo Grid */}
-        <main className="px-4 max-w-6xl mx-auto pb-16">
+        {/* Photo Feed */}
+        <main className="px-4 max-w-3xl mx-auto pb-16">
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
-              {Array.from({ length: 15 }).map((_, i) => (
-                <div key={i} className="rounded-xl skeleton" style={{ aspectRatio: '1', animationDelay: `${i * 0.05}s` }} />
+            <div className="space-y-5">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-2xl overflow-hidden panel">
+                  <div className="h-16 skeleton" style={{ animationDelay: `${i * 0.05}s` }} />
+                  <div className="skeleton" style={{ aspectRatio: '4 / 5', animationDelay: `${i * 0.08}s` }} />
+                  <div className="h-24 skeleton" style={{ animationDelay: `${i * 0.11}s` }} />
+                </div>
               ))}
             </div>
           ) : error ? (
@@ -389,17 +423,15 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-3">
-                {photos.map((photo, i) => (
-                  <div key={photo.id} className="animate-fade-up"
-                       style={{ animationDelay: `${Math.min(i, 10) * 0.04}s`, opacity: 0 }}>
-                    <PhotoCard
-                      photo={photo}
-                      priority={i < 6}
-                      onClick={setSelectedPhoto}
-                      onDelete={handleDelete}
-                    />
-                  </div>
+              <div className="space-y-6">
+                {photoPosts.map((post, i) => (
+                  <PhotoPost
+                    key={post.id}
+                    post={post}
+                    priority={i < 2}
+                    onPhotoClick={setSelectedPhoto}
+                    onDelete={handleDelete}
+                  />
                 ))}
               </div>
 

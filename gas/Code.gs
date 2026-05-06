@@ -25,6 +25,7 @@ var CONFIG = {
   PHOTOS_SHEET: "photos",
   USERS_SHEET: "users",
   SESSIONS_SHEET: "sessions",
+  COMMENTS_SHEET: "comments",
   
   // Password sederhana untuk proteksi (opsional, kosongkan untuk tanpa password)
   // Jika diisi, frontend harus mengirim header X-Auth-Password
@@ -44,7 +45,8 @@ var PHOTO_HEADERS = [
   "width",
   "height",
   "uploadedAt",
-  "updatedAt"
+  "updatedAt",
+  "albumId"
 ];
 
 var USER_HEADERS = [
@@ -58,7 +60,9 @@ var USER_HEADERS = [
   "createdAt",
   "updatedAt",
   "approvedAt",
-  "approvedBy"
+  "approvedBy",
+  "profilePhotoUrl",
+  "profilePhotoFileId"
 ];
 
 var SESSION_HEADERS = [
@@ -67,6 +71,15 @@ var SESSION_HEADERS = [
   "expiresAt",
   "createdAt",
   "lastSeenAt"
+];
+
+var COMMENT_HEADERS = [
+  "id",
+  "photoId",
+  "userId",
+  "userName",
+  "text",
+  "createdAt"
 ];
 
 // ============================================================
@@ -86,6 +99,8 @@ function doGet(e) {
       result = getPhotos(e);
     } else if (action === "getPhoto") {
       result = getPhoto(e);
+    } else if (action === "getComments") {
+      result = getComments(e);
     } else if (action === "deletePhoto") {
       result = deletePhoto(e);
     } else if (action === "getStats") {
@@ -130,6 +145,10 @@ function doPost(e) {
       result = loginUser(data);
     } else if (action === "logout") {
       result = logoutUser(data);
+    } else if (action === "changePassword") {
+      result = changePassword(data);
+    } else if (action === "updateProfile") {
+      result = updateProfile(data);
     } else if (action === "setUserApproval") {
       result = setUserApproval(data);
     } else if (action === "setUserRole") {
@@ -140,6 +159,10 @@ function doPost(e) {
       result = deletePhoto(null, data);
     } else if (action === "updatePhoto") {
       result = updatePhoto(null, data);
+    } else if (action === "addComment") {
+      result = addComment(data);
+    } else if (action === "deleteComment") {
+      result = deleteComment(data);
     } else {
       result = { success: false, error: "Unknown action: " + action };
     }
@@ -215,6 +238,16 @@ function getSessionsSheet() {
   return sheet;
 }
 
+function getCommentsSheet() {
+  var ss = getOrCreateSpreadsheet();
+  var sheet = ss.getSheetByName(CONFIG.COMMENTS_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG.COMMENTS_SHEET);
+  }
+  setupSheet(sheet, COMMENT_HEADERS);
+  return sheet;
+}
+
 function setupSheet(sheet, headers) {
   var headerCount = headers.length;
   var lastRow = sheet.getLastRow();
@@ -235,6 +268,18 @@ function setupSheet(sheet, headers) {
     }
 
     sheet.getRange(1, 1, 1, headerCount).setValues([headers]);
+  } else {
+    var currentHeader = sheet.getRange(1, 1, 1, headerCount).getValues()[0];
+    var needsHeaderUpdate = false;
+    for (var j = 0; j < headers.length; j++) {
+      if (currentHeader[j] !== headers[j]) {
+        needsHeaderUpdate = true;
+        break;
+      }
+    }
+    if (needsHeaderUpdate) {
+      sheet.getRange(1, 1, 1, headerCount).setValues([headers]);
+    }
   }
 
   var headerRange = sheet.getRange(1, 1, 1, headerCount);
@@ -280,7 +325,9 @@ function userFromRow(row) {
     createdAt: row[7] || "",
     updatedAt: row[8] || "",
     approvedAt: row[9] || "",
-    approvedBy: row[10] || ""
+    approvedBy: row[10] || "",
+    profilePhotoUrl: row[11] || "",
+    profilePhotoFileId: row[12] || ""
   };
 }
 
@@ -409,7 +456,9 @@ function registerUser(data) {
     now,
     now,
     firstUser ? now : "",
-    firstUser ? "system" : ""
+    firstUser ? "system" : "",
+    "",
+    ""
   ]);
 
   var user = {
@@ -421,7 +470,9 @@ function registerUser(data) {
     createdAt: now,
     updatedAt: now,
     approvedAt: firstUser ? now : "",
-    approvedBy: firstUser ? "system" : ""
+    approvedBy: firstUser ? "system" : "",
+    profilePhotoUrl: "",
+    profilePhotoFileId: ""
   };
 
   if (firstUser) {
@@ -468,6 +519,85 @@ function getMe(e) {
   var auth = requireAuth(e.parameter.token);
   if (!auth.success) return auth;
   return { success: true, user: auth.user };
+}
+
+function saveProfilePhoto(userId, filename, mimeType, base64Data) {
+  if (!base64Data) return "";
+
+  var decoded;
+  try {
+    decoded = Utilities.base64Decode(base64Data);
+  } catch (err) {
+    throw new Error("Gagal membaca foto profil: " + err.toString());
+  }
+
+  var maxSize = 5 * 1024 * 1024;
+  if (decoded.length > maxSize) {
+    throw new Error("Foto profil terlalu besar. Maksimal 5MB.");
+  }
+
+  var rootFolder = getOrCreateRootFolder();
+  var profileFolder = getOrCreateSubFolder(rootFolder, "Profile Photos");
+  var safeName = filename || ("profile_" + userId + ".jpg");
+  var blob = Utilities.newBlob(decoded, mimeType || "image/jpeg", safeName);
+  var driveFile = profileFolder.createFile(blob);
+  driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return {
+    url: buildDriveImageUrl(driveFile.getId(), 400),
+    fileId: driveFile.getId()
+  };
+}
+
+function changePassword(data) {
+  var auth = requireAuth(data.token);
+  if (!auth.success) return auth;
+
+  var currentPassword = String(data.currentPassword || "");
+  var newPassword = String(data.newPassword || "");
+  if (newPassword.length < 6) return { success: false, error: "Password baru minimal 6 karakter" };
+
+  var record = findUserById(auth.user.id);
+  if (!record) return { success: false, error: "User tidak ditemukan" };
+  if (record.raw[3] !== hashPassword(currentPassword, record.raw[4])) {
+    return { success: false, error: "Password lama tidak sesuai" };
+  }
+
+  var salt = Utilities.getUuid();
+  var now = new Date().toISOString();
+  var sheet = getUsersSheet();
+  sheet.getRange(record.row, 4).setValue(hashPassword(newPassword, salt));
+  sheet.getRange(record.row, 5).setValue(salt);
+  sheet.getRange(record.row, 9).setValue(now);
+
+  return { success: true, user: findUserById(auth.user.id).user };
+}
+
+function updateProfile(data) {
+  var auth = requireAuth(data.token);
+  if (!auth.success) return auth;
+
+  var record = findUserById(auth.user.id);
+  if (!record) return { success: false, error: "User tidak ditemukan" };
+
+  var sheet = getUsersSheet();
+  var now = new Date().toISOString();
+  var name = String(data.name || "").trim();
+  if (name) {
+    sheet.getRange(record.row, 2).setValue(name);
+  }
+
+  if (data.photoBase64) {
+    try {
+      var profilePhoto = saveProfilePhoto(auth.user.id, data.filename, data.mimeType, data.photoBase64);
+      sheet.getRange(record.row, 12).setValue(profilePhoto.url);
+      sheet.getRange(record.row, 13).setValue(profilePhoto.fileId);
+    } catch (err) {
+      return { success: false, error: err.message || err.toString() };
+    }
+  }
+
+  sheet.getRange(record.row, 9).setValue(now);
+  return { success: true, user: findUserById(auth.user.id).user };
 }
 
 function listUsers(e) {
@@ -539,6 +669,7 @@ function uploadPhoto(data) {
   var base64Data = data.base64;
   var caption = data.caption || "";
   var tags = data.tags || "";
+  var albumId = data.albumId || Utilities.getUuid();
   
   if (!base64Data) {
     return { success: false, error: "Tidak ada data foto (base64 kosong)" };
@@ -589,7 +720,8 @@ function uploadPhoto(data) {
     "",
     "",
     now.toISOString(),
-    now.toISOString()
+    now.toISOString(),
+    albumId
   ]);
   
   return {
@@ -605,7 +737,9 @@ function uploadPhoto(data) {
       driveUrl: buildDriveOpenUrl(fileId),
       size: driveFile.getSize(),
       mimeType: driveFile.getMimeType(),
-      uploadedAt: now.toISOString()
+      uploadedAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+      albumId: albumId
     }
   };
 }
@@ -641,7 +775,8 @@ function photoFromRow(row) {
     width: row[9] || "",
     height: row[10] || "",
     uploadedAt: row[11] || "",
-    updatedAt: row[12] || ""
+    updatedAt: row[12] || "",
+    albumId: row[13] || row[0]
   };
 }
 
@@ -801,6 +936,88 @@ function deletePhoto(e, data) {
   }
   
   return { success: false, error: "Foto tidak ditemukan" };
+}
+
+// ============================================================
+// KOMENTAR FOTO
+// ============================================================
+function commentFromRow(row) {
+  return {
+    id: row[0],
+    photoId: row[1],
+    userId: row[2],
+    userName: row[3] || "User",
+    text: row[4] || "",
+    createdAt: row[5] || ""
+  };
+}
+
+function getComments(e) {
+  var auth = requireAuth(e.parameter.token);
+  if (!auth.success) return auth;
+
+  var photoId = e.parameter.photoId || "";
+  if (!photoId) return { success: false, error: "ID foto diperlukan" };
+
+  var sheet = getCommentsSheet();
+  var data = sheet.getDataRange().getValues();
+  var comments = [];
+
+  for (var i = 1; i < data.length; i++) {
+    if (data[i][1] === photoId) comments.push(commentFromRow(data[i]));
+  }
+
+  comments.sort(function(a, b) {
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+
+  return { success: true, comments: comments };
+}
+
+function addComment(data) {
+  var auth = requireAuth(data.token);
+  if (!auth.success) return auth;
+
+  var photoId = data.photoId || "";
+  var text = String(data.text || "").trim();
+  if (!photoId) return { success: false, error: "ID foto diperlukan" };
+  if (!text) return { success: false, error: "Komentar tidak boleh kosong" };
+  if (text.length > 500) return { success: false, error: "Komentar maksimal 500 karakter" };
+
+  var now = new Date().toISOString();
+  var comment = [
+    Utilities.getUuid(),
+    photoId,
+    auth.user.id,
+    auth.user.name || auth.user.email || "User",
+    text,
+    now
+  ];
+
+  getCommentsSheet().appendRow(comment);
+  return { success: true, comment: commentFromRow(comment) };
+}
+
+function deleteComment(data) {
+  var auth = requireAuth(data.token);
+  if (!auth.success) return auth;
+
+  var commentId = data.id || "";
+  if (!commentId) return { success: false, error: "ID komentar diperlukan" };
+
+  var sheet = getCommentsSheet();
+  var rows = sheet.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) {
+    if (rows[i][0] === commentId) {
+      if (rows[i][2] !== auth.user.id && auth.user.role !== "admin") {
+        return { success: false, error: "Tidak bisa menghapus komentar ini" };
+      }
+      sheet.deleteRow(i + 1);
+      return { success: true };
+    }
+  }
+
+  return { success: false, error: "Komentar tidak ditemukan" };
 }
 
 // ============================================================
